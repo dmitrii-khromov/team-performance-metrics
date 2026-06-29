@@ -46,6 +46,35 @@ class AzureDevOpsWorkItemsClient:
                 ORDER BY [System.ChangedDate] DESC
             """
         }
+        return self._run_wiql(wiql)
+
+    def get_all_work_items(
+        self,
+        assigned_to: str,
+        start_date: str,
+        end_date: str
+    ) -> List[Dict[str, Any]]:
+        """
+        Fetch all work items assigned to a developer in a time period, any state.
+
+        Used by the summary endpoints that aggregate across every status
+        (status / type / assignment / priority-risk / effort breakdowns).
+        """
+        wiql = {
+            "query": f"""
+                SELECT [System.Id]
+                FROM workitems
+                WHERE
+                    [System.AssignedTo] = '{assigned_to}'
+                    AND [System.ChangedDate] >= '{start_date}'
+                    AND [System.ChangedDate] <= '{end_date}'
+                ORDER BY [System.ChangedDate] DESC
+            """
+        }
+        return self._run_wiql(wiql)
+
+    def _run_wiql(self, wiql: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Execute a WIQL query and expand the matching ids to full work items."""
         response = self.session.post(f"{self.base_url}/wiql?api-version=7.0", json=wiql)
         response.raise_for_status()
         work_item_refs = response.json().get("workItems", [])

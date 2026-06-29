@@ -60,6 +60,19 @@ flask run
 
 The API will be available at `http://127.0.0.1:5000`.
 
+## Debug vs. Real mode
+
+The six summary endpoints support two modes:
+
+- **Debug mode** (default): returns hardcoded sample data, no external calls.
+- **Real mode**: queries Azure DevOps (per employee in `config.py`) and ETS for live data.
+
+Mode is resolved per request: `?debug=true` (stubs) / `?debug=false` (live). The
+default when no param is sent is controlled by `APP_MODE` (`debug` | `real`).
+ETS authenticates as a single user, so ETS-derived effort/activity resolves only
+for the employee configured in `.env`; ADO data is fetched for every employee.
+The front-end "Debug/Real" switch sets the `debug` query param automatically.
+
 ## API Endpoints
 
 | Endpoint | Description |

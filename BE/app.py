@@ -14,6 +14,9 @@ import os
 import random
 import string
 
+from config import is_debug_mode
+import summaries
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -60,6 +63,10 @@ def ets_work_items():
 @app.route("/api/work-items-status-summary")
 def work_items_status_summary():
     # Pie/bar chart: Work item status distribution per employee
+    start_date = request.args.get("start_date", "2025-03-01")
+    end_date = request.args.get("end_date", "2025-08-16")
+    if not is_debug_mode(request):
+        return jsonify(summaries.status_summary(start_date, end_date))
     data = {
         "labels": ["Active", "Closed", "Resolved"],
         "counts": [
@@ -74,6 +81,10 @@ def work_items_status_summary():
 @app.route("/api/work-items-effort-summary")
 def work_items_effort_summary():
     # Bar/line chart: Planned vs. actual effort per employee
+    start_date = request.args.get("start_date", "2025-03-01")
+    end_date = request.args.get("end_date", "2025-08-16")
+    if not is_debug_mode(request):
+        return jsonify(summaries.effort_summary(start_date, end_date))
     data = {
         "labels": ["Anna Naumova", "Pavlo Sokolov", "Ilfat Galiev", "Dmitrii Khromov"],
         "plannedEffort": [40, 32, 36, 50],   # hours
@@ -85,6 +96,10 @@ def work_items_effort_summary():
 @app.route("/api/work-items-type-breakdown")
 def work_items_type_breakdown():
     # Pie/bar chart: Work item type breakdown per employee
+    start_date = request.args.get("start_date", "2025-03-01")
+    end_date = request.args.get("end_date", "2025-08-16")
+    if not is_debug_mode(request):
+        return jsonify(summaries.type_breakdown(start_date, end_date))
     data = {
         "labels": ["Bug", "Task", "Product Backlog Item"],
         "counts": [
@@ -99,6 +114,10 @@ def work_items_type_breakdown():
 @app.route("/api/work-items-assignment-summary")
 def work_items_assignment_summary():
     # Bar chart: Workload distribution (number of work items assigned)
+    start_date = request.args.get("start_date", "2025-03-01")
+    end_date = request.args.get("end_date", "2025-08-16")
+    if not is_debug_mode(request):
+        return jsonify(summaries.assignment_summary(start_date, end_date))
     data = {
         "labels": ["Anna Naumova", "Pavlo Sokolov", "Ilfat Galiev", "Dmitrii Khromov"],
         "assignedCount": [25, 15, 20, 22]
@@ -108,6 +127,10 @@ def work_items_assignment_summary():
 @app.route("/api/work-items-priority-risk-summary")
 def work_items_priority_risk_summary():
     # Bar/bubble chart: Priority and risk analysis per employee
+    start_date = request.args.get("start_date", "2025-03-01")
+    end_date = request.args.get("end_date", "2025-08-16")
+    if not is_debug_mode(request):
+        return jsonify(summaries.priority_risk_summary(start_date, end_date))
     data = {
         "labels": ["High", "Medium", "Low"],
         "priorityCounts": [
@@ -130,6 +153,9 @@ def work_items_activity_summary():
     employee = request.args.get("employee", "Dmitrii Khromov")
     start_date = request.args.get("start_date", "2025-08-01")
     end_date = request.args.get("end_date", "2025-08-16")
+
+    if not is_debug_mode(request):
+        return jsonify(summaries.activity_summary(employee, start_date, end_date))
 
     activity_types = ["Investigation", "Development", "Documentation", "Code review", "Testing"]
 

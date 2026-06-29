@@ -1,9 +1,27 @@
 // Base URL for your API
 const BASE_URL = "http://localhost:5000/api";
 
+// Mode: "debug" uses backend stubs, "real" queries Azure DevOps + ETS.
+// Persisted in localStorage so it survives reloads.
+let appMode = (typeof localStorage !== "undefined" && localStorage.getItem("appMode")) || "debug";
+
+export function setAppMode(mode) {
+  appMode = mode === "real" ? "real" : "debug";
+  if (typeof localStorage !== "undefined") localStorage.setItem("appMode", appMode);
+}
+
+export function getAppMode() {
+  return appMode;
+}
+
+function modeParam() {
+  return `debug=${appMode === "real" ? "false" : "true"}`;
+}
+
 // Helper for GET requests
 async function fetchJson(url) {
-  const response = await fetch(url);
+  const sep = url.includes("?") ? "&" : "?";
+  const response = await fetch(`${url}${sep}${modeParam()}`);
   if (!response.ok) throw new Error("Network response was not ok");
   return response.json();
 }
